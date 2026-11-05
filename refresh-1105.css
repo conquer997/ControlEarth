@@ -1,0 +1,59 @@
+/* November refresh. Existing paper typography is retained; hero and viewers refined. */
+[hidden]{display:none!important}
+.hero{height:670px;background:#071522}
+.hero:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 76% 38%,#14384a55,transparent 55%);pointer-events:none;z-index:0}
+.hero nav{top:29px;width:min(1140px,92%);padding-bottom:18px;border-bottom:1px solid #bce6ee19}
+.brand{font-size:17px;letter-spacing:2px;display:inline-flex;align-items:center;gap:1px}
+.brand .brand-earth{font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif;font-size:24px;line-height:1;letter-spacing:0;margin:0 2px;color:#41b7ee}
+.hero nav div a{font-size:12px}.hero nav div{gap:29px}
+.hero-core{max-width:1180px;grid-template-columns:46% 54%;padding:82px 28px 155px;gap:12px}
+.hero .logo-stage{max-width:450px;filter:none;isolation:isolate}
+.logo-stage .logo-video{border-radius:0;mix-blend-mode:lighten;
+ -webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 90%,transparent);
+ -webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 90%,transparent);mask-composite:intersect}
+.hero-copy{padding-left:18px}.hero h1{font-size:74px}.hero .slogan{font-size:37px;letter-spacing:2px}
+.hero .eyebrow{color:#8fbac6;font-size:10px;letter-spacing:3px}.hero-description{font-size:17px}
+.film.bottom-film{bottom:22px;left:0;width:100%;height:103px;opacity:.60;animation:none;overflow:hidden;mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
+.film-track,.film-group{display:flex;width:max-content}
+.film-track{animation:scene-film 90s linear infinite}
+.film-group{gap:12px;padding-right:12px;flex:none}
+.bottom-film .film-group img{display:block;flex:none;width:152px;height:95px;object-fit:cover;filter:saturate(.83);border-radius:4px;border:1px solid #d5fcff24}
+.motion-paused .film-track{animation-play-state:paused}
+@keyframes scene-film{to{transform:translateX(-50%)}}
+.tabs{gap:7px}.tabs button{font-size:13px}
+.comparison>img,.layout-overlay img{user-select:none;-webkit-user-drag:none}
+.divider{pointer-events:none;z-index:3}.divider:after{display:none}
+.divider-handle{pointer-events:auto;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;border:1px solid #ccd9e1;background:#fff;color:#183848;box-shadow:0 3px 15px #07152255;font-size:25px;padding:0;touch-action:none;cursor:ew-resize;user-select:none}
+.divider-handle:hover{background:#f2fffd;border-color:#23c2bd;color:#183848}.divider-handle:active{cursor:grabbing}
+#scene-caption{overflow-wrap:anywhere;text-align:center}
+.detail-window{max-height:none;touch-action:none;outline-offset:4px}.detail-window.dragging{cursor:grabbing}
+.detail-window img{pointer-events:none;user-select:none;-webkit-user-drag:none}
+.roi{touch-action:manipulation;box-shadow:0 0 0 1px #07152270;font-weight:700}
+.detail-grid .viewer-controls{min-height:40px}.detail-grid .fine{overflow-wrap:anywhere;font-size:12px}
+.dataset-evidence{margin:62px 0 0}.dataset-evidence h3{text-align:center;margin:52px 0 16px;font-size:25px}.dataset-evidence .intro{font-size:16px}
+.figure-pair{display:grid;grid-template-columns:1fr 1fr;gap:18px;background:#fff;padding:18px;border-radius:8px;border:1px solid #dce5eb}
+.figure-pair img{align-self:center}.figure-pair figcaption{grid-column:1/-1;margin-top:0}
+.dataset-pair-title{margin-top:55px;font-size:25px}.sample-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.real-comparison{margin-top:38px}.lead{line-height:1.8}
+@media(min-width:768px) and (max-width:1100px){.hero{height:620px}.hero h1{font-size:58px}.hero .slogan{font-size:30px}.hero-core{padding-left:26px;padding-right:26px}.hero-copy{padding-left:8px}}
+@media(max-width:767px){.hero{height:830px}.hero nav{top:22px;padding-bottom:15px;width:91%}.brand{font-size:13px;letter-spacing:1.3px}.brand .brand-earth{font-size:20px}.hero nav div{gap:13px}.hero nav div a{font-size:10px}.hero-core{grid-template-columns:1fr;grid-template-rows:310px 1fr;padding:67px 20px 145px;gap:0}.hero .logo-stage{width:310px;max-width:100%;margin:auto}.hero-copy{padding:0}.hero h1{font-size:54px}.hero .slogan{font-size:29px;letter-spacing:1.4px;margin-bottom:12px}.hero .eyebrow{font-size:9px;letter-spacing:2px}.hero-description{font-size:15px;margin-bottom:12px}.film.bottom-film{height:85px;bottom:18px}.bottom-film .film-group img{width:126px;height:78px}.film-group{gap:9px;padding-right:9px}.figure-pair{grid-template-columns:1fr;padding:13px;gap:15px}.sample-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tabs button{font-size:12px;padding:7px 11px}.dataset-evidence h3,.dataset-pair-title{font-size:22px}.divider-handle{width:46px;height:46px}}
+@media(max-width:390px){.hero{height:850px}.hero-core{grid-template-rows:300px 1fr}.hero .mobile-break{display:block}.hero h1{font-size:48px}.hero nav{gap:8px}.hero nav div{gap:6px}.brand{font-size:12px;letter-spacing:1px;flex-shrink:0;white-space:nowrap}.hero .slogan{line-height:1.45}}
+@media(prefers-reduced-motion:reduce){.film-track{animation:none}}
+
+/* Compact figure layout and a proportional, coloured globe wordmark. */
+.hero nav .brand{gap:0;letter-spacing:1.4px}
+.hero nav .brand{font-size:17px}
+.hero nav .brand-earth{display:inline-flex;align-items:center;justify-content:center;flex:none;width:.94em;height:.94em;font-size:inherit;line-height:1;letter-spacing:0;margin:0 .03em 0 -.04em;transform:translateY(-.02em)}
+.brand-earth svg{display:block;width:100%;height:100%;overflow:visible}
+.dataset-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;align-items:start;margin-top:46px}
+.dataset-evidence h3{font-size:22px;margin:0 0 12px}
+.dataset-evidence .intro{font-size:14px;line-height:1.65;margin-bottom:16px;min-height:3.3em}
+.dataset-evidence .figure-pair{margin-top:0;padding:10px;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.dataset-evidence .figure-pair figcaption{font-size:11px;line-height:1.5}
+#dataset-samples{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:22px}
+#dataset-samples .sample-pair{gap:3px;min-width:0}
+#dataset-samples .sample-pair img{width:calc((100% - 3px)/2);min-width:0;height:auto;max-height:none}
+#comparison-results .radar-compact{width:75%;margin:20px auto 0}
+@media(max-width:767px){.dataset-evidence{grid-template-columns:1fr;gap:30px;margin-top:36px}.dataset-evidence h3{font-size:21px}.dataset-evidence .intro{min-height:0}.dataset-evidence .figure-pair{width:min(100%,510px);margin-left:auto;margin-right:auto}#dataset-samples{grid-template-columns:repeat(6,minmax(132px,1fr));overflow-x:auto;padding-bottom:12px;overscroll-behavior-x:contain;scroll-snap-type:x proximity}#dataset-samples .sample-pair{scroll-snap-align:start}.hero nav .brand{letter-spacing:1px}}
+@media(max-width:767px){.hero nav .brand{font-size:13px}}
+@media(max-width:390px){.hero nav .brand{font-size:12px}}
