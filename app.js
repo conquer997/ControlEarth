@@ -1,15 +1,21 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], C=window.CONTROL_EARTH;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const phonePage=matchMedia('(max-width: 767px)').matches&&!!$('.hero .explore');
 let motionPaused=reduced.matches, logoTime=0, logoPlaying=!reduced.matches, last=0, revealPlaying=false,revealTime=0,scene=0,mode='compare',heroVisible=true;
 const A=n=>'assets/'+n+'.webp';
 const scenes=C?.scenes||[];
 // Local 1024-square video: one 24-second rotation; the palm is a fixed layer.
-$$('[data-logo]').forEach(el=>{el.innerHTML='<video class="logo-video" width="1024" height="1024" muted loop playsinline preload="metadata" poster="assets/logo-motion/poster.webp?v=5" aria-label="ControlEarth: a rotating illustrated globe transforms semantic labels into natural terrain above a stationary palm"><source src="assets/logo-motion/controlearth-logo-1024.mp4?v=5" type="video/mp4"><img src="assets/logo-motion/poster.webp?v=5" alt="ControlEarth illustrated globe above a stationary palm"></video>';});
+$$('[data-logo]').forEach(el=>{el.innerHTML='<video class="logo-video" width="1024" height="1024" muted loop playsinline preload="'+(phonePage?'none':'metadata')+'" poster="assets/logo-motion/poster.webp?v=5" aria-label="ControlEarth: a rotating illustrated globe transforms semantic labels into natural terrain above a stationary palm"><source src="assets/logo-motion/controlearth-logo-1024.mp4?v=5" type="video/mp4"><img src="assets/logo-motion/poster.webp?v=5" alt="ControlEarth illustrated globe above a stationary palm"></video>';});
 const logoVideos=$$('.logo-video');
 logoVideos.forEach(v=>{v.muted=true;v.defaultMuted=true;});
+let logoTimer=0,logoReady=!phonePage;
 function syncLogoPlayback(){
   const play=logoPlaying&&!document.hidden&&heroVisible;
+  if(!play){clearTimeout(logoTimer);logoTimer=0;}
+  // Show the original poster immediately. On a phone, only fetch the hero movie if
+  // the visitor actually stays here instead of jumping straight to the project film.
+  if(play&&!logoReady){if(!logoTimer)logoTimer=setTimeout(()=>{logoReady=true;syncLogoPlayback();},650);return;}
   logoVideos.forEach(v=>{if(play){v.play().catch(()=>{});}else v.pause();});
 }
 function renderLogo(){const t=logoVideos[0]?.currentTime||0;const seek=$('#logo-seek');if(seek)seek.value=t;const time=$('#logo-time');if(time)time.textContent=t.toFixed(1)+' / 24.0 s';}
@@ -80,7 +86,7 @@ if(filmPlayer){
   function updateFilm(){
     if(!visible||document.hidden){stopFilm();return;}
     if(!manualPause&&(requested||(!reduced.matches&&!saveData))&&filmPlayer.paused){
-      if(!started&&!starting){
+      if(!phonePage&&!started&&!starting){
         // Give an uncached MP4 a small head start without waiting for the whole file.
         starting=true;filmPlayer.preload='auto';
         const deadline=performance.now()+850;
@@ -106,11 +112,11 @@ if(filmPlayer){
     if(reduced.matches||saveData)requested=true;
     if(document.hidden)stopFilm();
   });
-  $('.hero .explore').addEventListener('click',()=>{requested=true;manualPause=false;updateFilm();});
+  $('.hero .explore').addEventListener('click',()=>{requested=true;manualPause=false;if(phonePage)filmPlayer.preload='auto';updateFilm();});
   if('IntersectionObserver' in window){
     const warmup=new IntersectionObserver(([entry])=>{
-      if(entry.isIntersecting){if(!saveData&&!reduced.matches)filmPlayer.preload='auto';warmup.disconnect();}
-    },{rootMargin:'220px 0px'});
+      if(entry.isIntersecting){if(!saveData&&!reduced.matches&&filmPlayer.preload==='none')filmPlayer.preload=phonePage?'metadata':'auto';warmup.disconnect();}
+    },{rootMargin:phonePage?'400px 0px':'220px 0px'});
     warmup.observe(filmPlayer);
     new IntersectionObserver(([entry])=>{
       if(entry.intersectionRatio>=.22)visible=true;
@@ -124,7 +130,24 @@ if(filmPlayer){
 const icons={Paper:'M5 2h9l5 5v15H5z M14 2v6h5 M8 12h8 M8 16h8',Code:'M8 6l-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18',Dataset:'M3 5c0-4 18-4 18 0s-18 4-18 0v14c0 4 18 4 18 0V5 M3 12c0 4 18 4 18 0',Model:'M12 2l10 5v10l-10 5L2 17V7z M2 7l10 5 10-5 M12 12v10'};
 function resource(name){const el=document.createElement(C.resources[name]?'a':'button');el.className='resource';el.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[name]}"/></svg><span>${name}</span>`;if(C.resources[name]){el.href=C.resources[name];el.rel='noopener';}else el.addEventListener('click',()=>{$('#release-title').textContent=name+' · Release pending';$('#release-dialog').showModal();});return el;}
 ['Paper','Code','Dataset'].forEach(x=>$('#paper-buttons').append(resource(x)));Object.keys(C.resources).forEach(x=>$('#all-resources').append(resource(x)));
-const film=$('#bottom-film');if(film){const track=document.createElement('div');track.className='film-track';for(let group=0;group<2;group++){const strip=document.createElement('div');strip.className='film-group';for(let i=0;i<13;i++){const im=document.createElement('img');im.src=A('film-'+String(i).padStart(2,'0'));im.alt='';im.width=320;im.height=320;im.decoding='async';strip.append(im);}track.append(strip);}film.append(track);}
+const film=$('#bottom-film');if(film){
+  const track=document.createElement('div');track.className='film-track';
+  // With a moving strip only the visible thumbnails and the next ones need the link now.
+  const nearby=phonePage&&'IntersectionObserver' in window?new IntersectionObserver(entries=>{
+    for(const e of entries)if(e.isIntersecting){e.target.src=e.target.dataset.thumb;nearby.unobserve(e.target);}
+  },{root:film,rootMargin:'0px 110px'}):null;
+  for(let group=0;group<2;group++){
+    const strip=document.createElement('div');strip.className='film-group';
+    for(let i=0;i<13;i++){
+      const im=document.createElement('img'),url=A('film-'+String(i).padStart(2,'0'));
+      im.alt='';im.width=320;im.height=320;im.decoding='async';
+      if(nearby){im.fetchPriority='low';im.dataset.thumb=url;nearby.observe(im);}else im.src=url;
+      strip.append(im);
+    }
+    track.append(strip);
+  }
+  film.append(track);
+}
 function tabs(container,items,fn){items.forEach((name,i)=>{const b=document.createElement('button');b.textContent=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(i===0));b.tabIndex=i===0?0:-1;b.addEventListener('click',()=>{[...container.children].forEach(x=>{x.setAttribute('aria-selected',String(x===b));x.tabIndex=x===b?0:-1;});fn(i);});b.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const all=[...container.children];let next=e.key==='Home'?0:e.key==='End'?all.length-1:(i+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;all[next].click();all[next].focus();}});container.append(b);});}
 tabs($('#scene-tabs'),scenes.map(s=>s.name),i=>{scene=i;revealPlaying=false;updatePlay();setDivider(50);renderScene();});
 let sceneLoad=0;
