@@ -1,6 +1,6 @@
 window.CONTROL_EARTH={
 title:'ControlEarth: Controllable Ultra-High-Resolution Image Generation for Earth Observation',
-authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Yue Zhou','Xue Yang','Haipeng Wang','Yansheng Li','Naoto Yokoya','Junchi Yan'],
+authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Junchi Yan'],
 resources:{Paper:null,Code:null,Dataset:null,Model:null},
 scenes:[
 {name:'Industrial district',key:'harbour',source:'iSAID_P2766_00.png'},
@@ -27,5 +27,8 @@ details:[
 ],
 // Corrected author-supplied record: Flood / SegFormer / few-shot / 3x = 62.85 / 77.67.
 floodFewShot:{baseline:[58.81,74.16],threeTimes:[62.85,77.67],fourTimes:[63.81,77.93]},
-citation:'@misc{controlearth,\n  title = {ControlEarth: Controllable Ultra-High-Resolution Image Generation for Earth Observation},\n  author = {Ye, Ziqi and Xin, Zepeng and Zou, Zhen and Li, Danfeng and Gong, Ziyang and Chen, Hongruixuan and Wang, Di and Hu, Xiaoxing and Zhou, Yue and Yang, Xue and Wang, Haipeng and Li, Yansheng and Yokoya, Naoto and Yan, Junchi}\n}'
+get citation(){
+  const names=this.authors.map(name=>{const i=name.lastIndexOf(' ');return name.slice(i+1)+', '+name.slice(0,i);});
+  return '@misc{controlearth,\n  title = {'+this.title+'},\n  author = {'+names.join(' and ')+'}\n}';
+}
 };

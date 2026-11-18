@@ -53,7 +53,62 @@
 #dataset-samples{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:22px}
 #dataset-samples .sample-pair{gap:3px;min-width:0}
 #dataset-samples .sample-pair img{width:calc((100% - 3px)/2);min-width:0;height:auto;max-height:none}
-#comparison-results .radar-compact{width:75%;margin:20px auto 0}
+#comparison-results .radar-compact{width:60%;margin:20px auto 0}
 @media(max-width:767px){.dataset-evidence{grid-template-columns:1fr;gap:30px;margin-top:36px}.dataset-evidence h3{font-size:21px}.dataset-evidence .intro{min-height:0}.dataset-evidence .figure-pair{width:min(100%,510px);margin-left:auto;margin-right:auto}#dataset-samples{grid-template-columns:repeat(6,minmax(132px,1fr));overflow-x:auto;padding-bottom:12px;overscroll-behavior-x:contain;scroll-snap-type:x proximity}#dataset-samples .sample-pair{scroll-snap-align:start}.hero nav .brand{letter-spacing:1px}}
 @media(max-width:767px){.hero nav .brand{font-size:13px}}
 @media(max-width:390px){.hero nav .brand{font-size:12px}}
+
+/* Quiet night sky: one static layer, three occasional points of light. */
+.hero-stars{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;color:#c0d8ec}
+.hero-stars::before{content:"";position:absolute;inset:0;background:
+ radial-gradient(circle at 3% 22%,#a4c9e699 .8px,transparent 1.4px),
+ radial-gradient(circle at 8% 57%,#8fb7d98c .7px,transparent 1.3px),
+ radial-gradient(circle at 14% 34%,#c5dced8c .7px,transparent 1.3px),
+ radial-gradient(circle at 18% 15%,#b9d4e69c .8px,transparent 1.5px),
+ radial-gradient(circle at 24% 73%,#91b4cf80 .8px,transparent 1.4px),
+ radial-gradient(circle at 31% 11%,#b5d5e983 .6px,transparent 1.4px),
+ radial-gradient(circle at 39% 22%,#bcd8eb80 .8px,transparent 1.3px),
+ radial-gradient(circle at 45% 54%,#b8d5e992 .8px,transparent 1.3px),
+ radial-gradient(circle at 51% 14%,#b5d5e985 .6px,transparent 1.2px),
+ radial-gradient(circle at 60% 8%,#9fbbd070 .7px,transparent 1.3px),
+ radial-gradient(circle at 70% 21%,#b6d6e980 .7px,transparent 1.4px),
+ radial-gradient(circle at 74% 69%,#bfd9ea95 .8px,transparent 1.4px),
+ radial-gradient(circle at 80% 43%,#b7d7ed86 .7px,transparent 1.3px),
+ radial-gradient(circle at 86% 13%,#9ec8e580 .7px,transparent 1.2px),
+ radial-gradient(circle at 90% 61%,#b9d4e6a1 .8px,transparent 1.5px),
+ radial-gradient(circle at 94% 32%,#a0c3d685 .7px,transparent 1.4px),
+ radial-gradient(circle at 97% 78%,#a0c3d685 .7px,transparent 1.3px)}
+.hero-stars i{position:absolute;width:2px;height:2px;border-radius:100%;background:currentColor;box-shadow:0 0 4px #cceaff80;opacity:.18;animation:starlight 12s linear infinite}
+.hero-stars i:nth-child(1){left:9%;top:36%;animation-delay:-8s}
+.hero-stars i:nth-child(2){left:49%;top:24%;animation-delay:-3s;animation-duration:15s}
+.hero-stars i:nth-child(3){right:8%;top:49%;animation-delay:-9s;animation-duration:19s}
+@keyframes starlight{0%,67%,81%,100%{opacity:.18}73%{opacity:.83}77%{opacity:.33}}
+.motion-paused .hero-stars i{animation-play-state:paused}
+.hero h1{width:fit-content;color:#76aaa4;background:none}
+.hero .explore{color:#9dc6f3;gap:12px;min-height:40px}
+.hero .explore:is(:hover,:focus-visible){color:#bedcff}
+.hero .explore span{font-size:16px;line-height:1;letter-spacing:0}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .hero h1{background:linear-gradient(100deg,#608bd3 0%,#6899c1 26%,#72a7a4 51%,#79b189 75%,#81bd63 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+}
+.authors .author-line{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:0 .64em}
+.author-line .author{margin:0;white-space:nowrap}
+.demo-section{padding-top:44px;scroll-margin-top:18px}
+.demo-heading{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 12px}
+.demo-heading h2{margin:0;text-align:left;font-size:clamp(22px,2.4vw,30px)}
+.demo-heading span{font-size:13px;color:#526776;font-variant-numeric:tabular-nums;letter-spacing:.08em}
+#demo-video{display:block;width:100%;height:auto;aspect-ratio:4/3;border-radius:8px;background:#fff;box-shadow:0 0 0 1px #dde5e8}
+#demo-caption{margin:10px 0 0;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+#film-controls:not([hidden]){display:flex;align-items:center;gap:clamp(6px,1.3vw,16px);padding:5px 4px;background:#fff;color:#304759;font:500 14px/1.3 Arial,sans-serif}
+#film-controls button{min-height:40px;padding:4px 8px;border:0;background:transparent;color:#274b75;font:inherit;cursor:pointer;white-space:nowrap}
+#film-play{min-width:4em}
+#film-seek{min-width:32px;flex:1;width:0;accent-color:#457fa4;cursor:pointer}
+#film-clock{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#film-controls :focus-visible{outline:2px solid #347ca9;outline-offset:2px}
+#film-stage:fullscreen{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;background:#101820}
+#film-stage:fullscreen #demo-video{min-height:0;flex:1;object-fit:contain;background:transparent;box-shadow:none;border:0;border-radius:0}
+#film-stage:fullscreen #film-controls{padding-inline:2vw}
+@media(max-width:767px){.hero h1{margin-inline:auto}.demo-section{padding-top:30px}.authors .author-line{column-gap:.55em}}
+@media(prefers-reduced-motion:reduce){.hero-stars i{animation:none;opacity:.36}}
+@media(forced-colors:active){.hero h1{background:none;color:CanvasText}.hero-stars{display:none}}
