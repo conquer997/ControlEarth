@@ -1,7 +1,8 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], C=window.CONTROL_EARTH;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const phonePage=matchMedia('(max-width: 767px)').matches&&!!$('.hero .explore');
+const homeHero=$('.hero .explore')?.closest('.hero');
+const phonePage=matchMedia('(max-width: 767px)').matches&&!!homeHero;
 let motionPaused=reduced.matches, logoTime=0, logoPlaying=!reduced.matches, last=0, revealPlaying=false,revealTime=0,scene=0,mode='compare',heroVisible=true;
 const A=n=>'assets/'+n+'.webp';
 const scenes=C?.scenes||[];
@@ -9,7 +10,7 @@ const scenes=C?.scenes||[];
 $$('[data-logo]').forEach(el=>{if(!el.querySelector('video'))el.innerHTML='<video class="logo-video" width="1024" height="1024" muted loop playsinline preload="metadata" src="assets/logo-motion/controlearth-logo-1024.mp4?v=5" poster="assets/logo-motion/poster.webp?v=5" aria-label="ControlEarth animated logo"></video>';});
 const logoVideos=$$('.logo-video');
 const resumeAt=new WeakMap();
-let filmHasPriority=false;
+let filmHasPriority=false,jumpPending=false;
 let initialAnchor=$('.hero .explore')&&location.hash!=='#top'&&document.getElementById(location.hash.slice(1));
 if(initialAnchor){
   heroVisible=false;
@@ -32,14 +33,14 @@ function syncLogoPlayback(){
       if(v.paused)v.play().catch(()=>{});
     }else{
       v.pause();
-      if(phonePage&&(!heroVisible||filmHasPriority)&&v.hasAttribute('src')){
+      if(homeHero&&(!heroVisible||filmHasPriority)&&v.hasAttribute('src')){
         const b=v.buffered,complete=b.length===1&&b.start(0)<.08&&b.end(0)>=v.duration-.08;
         if(!complete){if(v.currentTime>0)resumeAt.set(v,v.currentTime);v.removeAttribute('src');v.load();}
       }
     }
   });
 }
-function prioritizeFilm(){if(phonePage&&!filmHasPriority){filmHasPriority=true;syncLogoPlayback();}}
+function prioritizeFilm(){if(!filmHasPriority){filmHasPriority=true;syncLogoPlayback();}}
 function renderLogo(){const t=logoVideos[0]?.currentTime||0;const seek=$('#logo-seek');if(seek)seek.value=t;const time=$('#logo-time');if(time)time.textContent=t.toFixed(1)+' / 24.0 s';}
 function resetLogo(){logoVideos.forEach(v=>{v.currentTime=0;});renderLogo();}
 function pauseMotion(value){motionPaused=value;logoPlaying=!value;document.body.classList.toggle('motion-paused',value);const b=$('#hero-pause');if(b){b.textContent=value?'Resume motion':'Pause motion';b.setAttribute('aria-pressed',String(value));}syncLogoPlayback();}
@@ -50,7 +51,7 @@ $('#logo-replay')?.addEventListener('click',()=>{resetLogo();pauseMotion(false);
 $('#logo-seek')?.addEventListener('input',e=>{pauseMotion(true);logoVideos.forEach(v=>{v.currentTime=+e.target.value;});$('#logo-play').textContent='Play';renderLogo();});
 document.addEventListener('visibilitychange',()=>{last=0;document.body.classList.toggle('motion-paused',document.hidden||motionPaused||!heroVisible);syncLogoPlayback();});
 reduced.addEventListener('change',e=>{pauseMotion(e.matches);if(e.matches)revealPlaying=false;});
-if($('.hero'))new IntersectionObserver(([entry])=>{const was=heroVisible;heroVisible=entry.isIntersecting&&!initialAnchor;if(heroVisible&&!was)filmHasPriority=false;document.body.classList.toggle('motion-paused',!heroVisible||motionPaused||document.hidden);syncLogoPlayback();}).observe($('.hero'));
+if(homeHero)new IntersectionObserver(([entry])=>{const was=heroVisible;heroVisible=entry.isIntersecting&&!initialAnchor;if(heroVisible&&!was&&!jumpPending)filmHasPriority=false;document.body.classList.toggle('motion-paused',!heroVisible||motionPaused||document.hidden);syncLogoPlayback();}).observe(homeHero);
 const revealSection=$('#generation');if(revealSection)new IntersectionObserver(es=>{if(!es[0].isIntersecting){revealPlaying=false;updatePlay();}}).observe(revealSection);
 function tick(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!document.hidden){renderLogo();if(revealPlaying){revealTime+=dt;const t=revealTime;const v=t<1.5?100:t<4.5?100-(t-1.5)/3*100:t<6.5?0:(t-6.5)/1.5*100;setDivider(v);if(t>=8){revealPlaying=false;setDivider(50);updatePlay();}}}requestAnimationFrame(tick);}requestAnimationFrame(tick);renderLogo();
 if(!C||!$('#paper-title'))return;
@@ -70,10 +71,44 @@ const filmPlayer=$('#demo-video');
 if(filmPlayer){
   let visible=false, manualPause=false, autoPausing=false, requested=false;
   const saveData=!!navigator.connection?.saveData;
-  let started=false,starting=false;
+  let tried=false,startPending=false,jumpTimer=0,statusTimer=0,sourceChosen=false;
+  let desktopIntent=location.hash==='#demonstration';
   const stage=$('#film-stage'),playButton=$('#film-play'),seek=$('#film-seek'),clock=$('#film-clock'),full=$('#film-full');
-  if(saveData||['slow-2g','2g','3g'].includes(navigator.connection?.effectiveType)){
-    filmPlayer.src=filmPlayer.querySelector('source').src;
+  const status=$('#film-status'),connection=navigator.connection;
+  function useLightFilm(){
+    if(saveData||['slow-2g','2g'].includes(connection?.effectiveType))return true;
+    if(!connection||(connection.effectiveType!=='3g'&&!(connection.downlink>0&&connection.downlink<3.5)))return false;
+    // An OS estimate can be stale (including on fast Wi-Fi). Let two recent
+    // uncached transfers from this origin over 6 Mbps overrule a pessimistic hint.
+    const now=performance.now();
+    const fast=performance.getEntriesByType('resource').filter(e=>e.responseEnd>=now-15000
+      &&e.name.startsWith(location.origin+'/')&&e.transferSize>=16384&&e.responseEnd>e.responseStart
+      &&e.transferSize*.008/Math.max(1,e.responseEnd-e.responseStart)>=6);
+    return location.protocol!=='file:'&&fast.length<2;
+  }
+  function prepare(){
+    prioritizeFilm();
+    if(!sourceChosen){
+      sourceChosen=true;
+      // HD averages 2.72 Mbps before peaks. Use the existing watermarked 720p
+      // encode on known constrained links; keep the desktop HD file otherwise.
+      if(!phonePage&&useLightFilm())filmPlayer.src=filmPlayer.querySelector('source').src;
+    }
+    if(filmPlayer.preload!=='auto')filmPlayer.preload='auto';
+  }
+  function hint(message=''){
+    clearTimeout(statusTimer);status.hidden=!message;status.textContent=message;
+  }
+  function loading(){if(!statusTimer&&status.hidden){statusTimer=setTimeout(()=>{statusTimer=0;if(!filmPlayer.paused&&filmPlayer.readyState<3)hint('Loading film…');},400);}}
+  function clearHint(){hint();statusTimer=0;}
+  function playNow(){
+    prepare();if(startPending||!filmPlayer.paused)return;
+    tried=true;startPending=true;clearHint();loading();
+    filmPlayer.play().then(()=>{startPending=false;},err=>{
+      startPending=false;
+      if(err.name==='AbortError')return;
+      manualPause=true;hint(err.name==='NotAllowedError'?'Press Play to start.':'Could not start the film. Press Play to retry.');syncControls();
+    });
   }
   const time=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
   function syncControls(){
@@ -87,7 +122,8 @@ if(filmPlayer){
       if(Math.min(innerHeight,box.bottom)-Math.max(0,box.top)<.22*Math.min(innerHeight,box.height)){
         stage.scrollIntoView({behavior:'instant',block:'center'});
       }
-      requested=true;manualPause=false;prioritizeFilm();filmPlayer.play().catch(()=>{});
+      if(filmPlayer.error)filmPlayer.load();
+      desktopIntent=true;requested=true;manualPause=false;playNow();
     }
     else {manualPause=true;filmPlayer.pause();}
   }
@@ -106,46 +142,59 @@ if(filmPlayer){
   filmPlayer.controls=false;$('#film-controls').hidden=false;syncControls();
   function stopFilm(){if(!filmPlayer.paused){autoPausing=true;filmPlayer.pause();}}
   function updateFilm(){
-    if(!visible||document.hidden){stopFilm();return;}
-    if(!manualPause&&(requested||(!reduced.matches&&!saveData))&&filmPlayer.paused){
-      prioritizeFilm();
-      if(!phonePage&&!started&&!starting){
-        // Give an uncached MP4 a small head start without waiting for the whole file.
-        starting=true;filmPlayer.preload='auto';
-        const deadline=performance.now()+850;
-        const prime=()=>{
-          if(!visible||document.hidden||manualPause){starting=false;return;}
-          const b=filmPlayer.buffered;
-          if((b.length&&b.start(0)<=.1&&b.end(0)>=1.6)||performance.now()>=deadline){
-            starting=false;started=true;updateFilm();
-          }else setTimeout(prime,80);
-        };
-        prime();return;
-      }
-      if(starting)return;
-      filmPlayer.play().catch(()=>{}); // Native controls remain available if autoplay is declined.
-    }
+    if((!visible&&!jumpPending)||(!phonePage&&!desktopIntent&&!jumpPending)||document.hidden){stopFilm();clearHint();return;}
+    if(!manualPause&&(requested||(!reduced.matches&&!saveData)))playNow();
   }
   filmPlayer.addEventListener('pause',()=>{
     if(!autoPausing&&visible&&!document.hidden&&!filmPlayer.ended)manualPause=true;
     autoPausing=false;
   });
   filmPlayer.addEventListener('play',()=>{
-    started=true;manualPause=false;
+    manualPause=false;
     if(reduced.matches||saveData)requested=true;
     if(document.hidden)stopFilm();
   });
-  $('.hero .explore').addEventListener('click',()=>{requested=true;manualPause=false;prioritizeFilm();if(phonePage)filmPlayer.preload='auto';updateFilm();});
+  filmPlayer.addEventListener('waiting',loading);
+  filmPlayer.addEventListener('playing',clearHint);
+  filmPlayer.addEventListener('pause',clearHint);
+  filmPlayer.addEventListener('error',()=>hint('Could not load the film. Press Play to retry.'));
+  $('.hero .explore').addEventListener('click',()=>{
+    desktopIntent=true;requested=true;manualPause=false;jumpPending=true;
+    // Start inside the click, before smooth scrolling. Do not let an old
+    // offscreen observer entry immediately pause this explicit request.
+    clearTimeout(jumpTimer);jumpTimer=setTimeout(()=>{jumpPending=false;updateFilm();checkApproach();},1800);
+    playNow();
+  });
+  const logo=homeHero.querySelector('.logo-video');
+  function checkApproach(){
+    if(document.hidden)return;
+    const box=filmPlayer.getBoundingClientRect(),g=logo.getBoundingClientRect();
+    const hadIntent=desktopIntent;
+    if(!jumpPending){if(scrollY>12)desktopIntent=true;else if(scrollY<4&&!document.fullscreenElement)desktopIntent=false;}
+    if(!phonePage&&visible&&hadIntent!==desktopIntent)updateFilm();
+    if(!jumpPending&&filmHasPriority&&(box.top>=innerHeight+280||scrollY<4)&&g.bottom>0&&g.top<innerHeight){
+      if(!tried){filmPlayer.preload='none';filmPlayer.load();}
+      filmHasPriority=false;syncLogoPlayback();
+    }
+    // On desktops, warm up only on a genuine approach after leaving the logo;
+    // never request the film merely because a tall first viewport is near it.
+    const gap=box.top-innerHeight;
+    const approaching=(g.bottom<=0&&gap<=Math.min(600,innerHeight*.65))||(gap<=220&&g.bottom<=innerHeight*.4);
+    if(!phonePage&&!filmHasPriority&&!reduced.matches&&!saveData&&!manualPause&&desktopIntent
+      &&scrollY>12&&box.top>0&&approaching)prepare();
+  }
+  let approachFrame=0;
+  addEventListener('scroll',()=>{if(!approachFrame)approachFrame=requestAnimationFrame(()=>{approachFrame=0;checkApproach();});},{passive:true});
   if('IntersectionObserver' in window){
-    const warmup=new IntersectionObserver(([entry])=>{
-      if(entry.isIntersecting&&!(phonePage&&heroVisible&&entry.boundingClientRect.top>=innerHeight)){if(!saveData&&!reduced.matches&&filmPlayer.preload==='none')filmPlayer.preload=phonePage?'metadata':'auto';warmup.disconnect();}
-    },{rootMargin:phonePage?'400px 0px':'220px 0px'});
-    warmup.observe(filmPlayer);
+    if(phonePage){const warmup=new IntersectionObserver(([entry])=>{
+      if(entry.isIntersecting&&!(heroVisible&&entry.boundingClientRect.top>=innerHeight)){if(!saveData&&!reduced.matches&&filmPlayer.preload==='none')filmPlayer.preload='metadata';warmup.disconnect();}
+    },{rootMargin:'400px 0px'});warmup.observe(filmPlayer);}
     new IntersectionObserver(([entry])=>{
-      if(entry.intersectionRatio>=.22)visible=true;
-      else if(entry.intersectionRatio<=.05)visible=false;
+      if(phonePage){if(entry.intersectionRatio>=.22)visible=true;else if(entry.intersectionRatio<=.05)visible=false;}
+      else visible=entry.isIntersecting&&entry.intersectionRect.height>=1;
+      if(visible){jumpPending=false;clearTimeout(jumpTimer);}
       updateFilm();
-    },{threshold:[0,.05,.22]}).observe(filmPlayer);
+    },{threshold:phonePage?[0,.05,.22]:[0,.002]}).observe(filmPlayer);
   }
   document.addEventListener('visibilitychange',updateFilm);
   reduced.addEventListener('change',()=>{if(reduced.matches){requested=false;stopFilm();}else updateFilm();});
