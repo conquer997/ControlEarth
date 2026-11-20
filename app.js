@@ -56,16 +56,14 @@ const revealSection=$('#generation');if(revealSection)new IntersectionObserver(e
 function tick(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!document.hidden){renderLogo();if(revealPlaying){revealTime+=dt;const t=revealTime;const v=t<1.5?100:t<4.5?100-(t-1.5)/3*100:t<6.5?0:(t-6.5)/1.5*100;setDivider(v);if(t>=8){revealPlaying=false;setDivider(50);updatePlay();}}}requestAnimationFrame(tick);}requestAnimationFrame(tick);renderLogo();
 if(!C||!$('#paper-title'))return;
 $('#paper-title').textContent=C.title;
-[C.authors.slice(0,8),C.authors.slice(8)].forEach((names,row)=>{
-  const line=document.createElement('div');line.className='author-line';
-  names.forEach((name,i)=>{
-    const e=document.createElement('span');e.className='author';e.textContent=name;
-    if(name==='Xue Yang'){const s=document.createElement('sup');s.className='corresponding';s.textContent='†';e.append(s);}
-    if(!row||i<names.length-1)e.append(',');
-    line.append(e,document.createTextNode(' '));
-  });
-  $('#authors').append(line);
+const byline=document.createElement('div');byline.className='author-line';
+C.authors.forEach((name,i)=>{
+  const e=document.createElement('span');e.className='author';e.textContent=name;
+  if(name==='Xue Yang'){const s=document.createElement('sup');s.className='corresponding';s.textContent='†';e.append(s);}
+  if(i<C.authors.length-1)e.append(',');
+  byline.append(e,document.createTextNode(' '));
 });
+$('#authors').append(byline);
 const note=document.createElement('div');note.className='fine';note.textContent='† Corresponding author';$('#authors').append(note);
 const filmPlayer=$('#demo-video');
 if(filmPlayer){
