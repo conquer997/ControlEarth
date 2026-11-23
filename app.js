@@ -219,9 +219,15 @@ const film=$('#bottom-film');if(film){
   film.append(track);
 }
 function tabs(container,items,fn){items.forEach((name,i)=>{const b=document.createElement('button');b.textContent=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(i===0));b.tabIndex=i===0?0:-1;b.addEventListener('click',()=>{[...container.children].forEach(x=>{x.setAttribute('aria-selected',String(x===b));x.tabIndex=x===b?0:-1;});fn(i);});b.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const all=[...container.children];let next=e.key==='Home'?0:e.key==='End'?all.length-1:(i+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;all[next].click();all[next].focus();}});container.append(b);});}
-tabs($('#scene-tabs'),scenes.map(s=>s.name),i=>{scene=i;revealPlaying=false;updatePlay();setDivider(50);renderScene();});
+// Swap these examples only in the comparison viewer, not in the dataset gallery.
+const comparisonScenes=scenes.slice();
+const industrial=scenes.findIndex(s=>s.key==='harbour'),residential=scenes.findIndex(s=>s.key==='urban');
+if(industrial!==-1&&residential!==-1){
+  [comparisonScenes[industrial],comparisonScenes[residential]]=[scenes[residential],scenes[industrial]];
+}
+tabs($('#scene-tabs'),comparisonScenes.map(s=>s.name),i=>{scene=i;revealPlaying=false;updatePlay();setDivider(50);renderScene();});
 let sceneLoad=0;
-function renderScene(){const s=scenes[scene],type=mode==='real'?'real':'generated',ticket=++sceneLoad;
+function renderScene(){const s=comparisonScenes[scene],type=mode==='real'?'real':'generated',ticket=++sceneLoad;
  const g=$('#generated'),l=$('#layout'),stage=$('#comparison');stage.setAttribute('aria-busy','true');
  g.src=A('scene-'+s.key+'-'+type);l.src=A('scene-'+s.key+'-layout');
  g.alt=s.name+' '+(mode==='real'?'real reference':'ControlEarth generated image');l.alt=s.name+' semantic layout';
