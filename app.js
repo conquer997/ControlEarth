@@ -58,7 +58,12 @@ if(!C||!$('#paper-title'))return;
 $('#paper-title').textContent=C.title;
 const byline=document.createElement('div');byline.className='author-line';
 C.authors.forEach((name,i)=>{
-  const e=document.createElement('span');e.className='author';e.textContent=name;
+  const e=document.createElement('span');e.className='author';
+  const url=C.authorLinks?.[name];
+  if(url){
+    const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+    link.textContent=name;e.append(link);
+  }else{e.textContent=name;}
   if(name==='Xue Yang'){const s=document.createElement('sup');s.className='corresponding';s.textContent='†';e.append(s);}
   if(i<C.authors.length-1)e.append(',');
   byline.append(e,document.createTextNode(' '));

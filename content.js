@@ -1,6 +1,22 @@
 window.CONTROL_EARTH={
 title:'ControlEarth: Controllable Ultra-High-Resolution Image Generation for Earth Observation',
 authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Dongshuo Yin','Zhihang Zhong','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Junchi Yan'],
+authorLinks:{
+  'Ziqi Ye':'https://scholar.google.com/citations?hl=zh-CN&user=GA0gV5cAAAAJ',
+  'Zepeng Xin':'https://scholar.google.com/citations?user=bAJIGTcAAAAJ',
+  'Ziyang Gong':'https://cuzyoung.github.io/ZiyangGong.github.io/',
+  'Hongruixuan Chen':'https://chrx97.com/',
+  'Di Wang':'https://dotwang.github.io/',
+  'Xiaoxing Hu':'https://xiaoxing2001.github.io/',
+  'Dongshuo Yin':'https://www.yindongshuo.top/',
+  'Zhihang Zhong':'https://zzh-tech.github.io/',
+  'Yue Zhou':'https://zhouyue.space/',
+  'Xiangyong Cao':'https://scholar.google.com/citations?user=IePM9RsAAAAJ',
+  'Xue Yang':'https://yangxue0827.github.io',
+  'Yansheng Li':'https://scholar.google.com/citations?user=wn9hc6UAAAAJ',
+  'Haipeng Wang':'https://scholar.google.com/citations?hl=en&user=Uvrkb7EAAAAJ',
+  'Junchi Yan':'https://scholar.google.com/citations?user=ga230VoAAAAJ',
+},
 resources:{Paper:null,Code:null,Dataset:null,Model:null},
 scenes:[
 {name:'Industrial district',key:'harbour',source:'iSAID_P2766_00.png'},
