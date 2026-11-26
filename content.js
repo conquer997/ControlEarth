@@ -1,6 +1,6 @@
 window.CONTROL_EARTH={
 title:'ControlEarth: Controllable Ultra-High-Resolution Image Generation for Earth Observation',
-authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Zhihang Zhong','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Junchi Yan'],
+authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Dongshuo Yin','Zhihang Zhong','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Junchi Yan'],
 resources:{Paper:null,Code:null,Dataset:null,Model:null},
 scenes:[
 {name:'Industrial district',key:'harbour',source:'iSAID_P2766_00.png'},
