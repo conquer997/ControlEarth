@@ -1,6 +1,6 @@
 window.CONTROL_EARTH={
 title:'ControlEarth: Controllable Ultra-High-Resolution Image Generation for Earth Observation',
-authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Dongshuo Yin','Zhihang Zhong','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Junchi Yan'],
+authors:['Ziqi Ye','Zepeng Xin','Zhen Zou','Danfeng Li','Ziyang Gong','Hongruixuan Chen','Di Wang','Xiaoxing Hu','Dongshuo Yin','Zhihang Zhong','Yue Zhou','Xiangyong Cao','Xue Yang','Yansheng Li','Haipeng Wang','Haifeng Li','Junchi Yan'],
 authorLinks:{
   'Ziqi Ye':'https://scholar.google.com/citations?hl=zh-CN&user=GA0gV5cAAAAJ',
   'Zepeng Xin':'https://scholar.google.com/citations?user=bAJIGTcAAAAJ',
@@ -15,6 +15,7 @@ authorLinks:{
   'Xue Yang':'https://yangxue0827.github.io',
   'Yansheng Li':'https://scholar.google.com/citations?user=wn9hc6UAAAAJ',
   'Haipeng Wang':'https://scholar.google.com/citations?hl=en&user=Uvrkb7EAAAAJ',
+  'Haifeng Li':'https://scholar.google.com/citations?user=51p_SJAAAAAJ',
   'Junchi Yan':'https://scholar.google.com/citations?user=ga230VoAAAAJ',
 },
 resources:{Paper:null,Code:null,Dataset:null,Model:null},
